@@ -1,3 +1,8 @@
+###################################
+#   Created by Robert Choi 2020   #
+#  https://github.com/robert-choi #
+###################################
+
 import tkinter as tk
 from random import randint
 
@@ -25,12 +30,18 @@ class InsertionSorterGUI():
         self.sort_list = []
         self.window.delete('all')
         for i in range(100):
-            random_height = randint(20,260)
-            line_id = self.window.create_line(4*i+50, 20, 4*i+50, random_height+20)
+            random_height = randint(40,280)
+            line_id = self.window.create_line(4*i+50, 20, 4*i+50, random_height)
             self.sort_list.append([random_height, line_id])
         self.window.update()
 
+    ##########################################################################
+
     def start_sorting(self):
+        """
+        Start a main loop to iterate through each line, then call the insert()
+        method to move the current line
+        """
         self.sorting = True
         for i, line in enumerate(self.sort_list):
             if not self.sorting:
@@ -38,19 +49,46 @@ class InsertionSorterGUI():
             if i==0:
                 continue
             del self.sort_list[i]
-            self.window.delete(line[1])
-            line[1] = self.window.create_line(4*i+50, 20, 4*i+50, line[0], fill='red')
+            self.window.itemconfig(line[1], fill='red')
             self.window.update()
-            self.insert(i, line)
-        print(self.sort_list)
+            self.insert(i, line, 0)
 
-    def insert(self, index, line):
+            if i == len(self.sort_list)-1:
+                self.sorting = False
+                for complete_line in self.sort_list:
+                    self.window.itemconfig(complete_line[1], fill='green')
+                self.window.update()
+
+    def insert(self, index, line, lines_skipped=None):
+        """
+        Called implicitly from the start_sorting method.
+        Checks if the line is in the correct location, then, highlights
+        skipped lines and continues
+        :param index: int
+        :param line: List
+        :param lines_skipped: int
+        """
+        if not self.sorting:
+            return
         if index == 0:
-            self.sort_list.insert(index, line)
+            pass
         elif line[0] < self.sort_list[index-1][0]:
-            self.insert(index-1, line)
-        else:
-            self.sort_list.insert(index, line)
+            lines_skipped += 1
+            self.insert(index-1, line, lines_skipped)
+            return
+
+        self.sort_list.insert(index, line)
+        self.window.delete(line[1])
+        self.sort_list[index][1] = self.window.create_line(4*index+50, 20, 4*index+50, line[0], fill='red')
+        for i in range(index+1, index+lines_skipped+1):
+            self.window.delete(self.sort_list[i][1])
+            self.sort_list[i][1] = self.window.create_line(4*i+50, 20, 4*i+50, self.sort_list[i][0], fill='cyan')
+        self.window.update()
+
+        self.window.itemconfig(self.sort_list[index][1], fill='black')
+        for j in range(index+1, index+lines_skipped+1):
+            self.window.itemconfig(self.sort_list[j][1], fill='black')
+        self.window.update()
 
 ##########################################################################
 
