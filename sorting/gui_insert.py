@@ -7,11 +7,11 @@ import tkinter as tk
 from random import randint
 
 class InsertionSorterGUI():
+    """
+    Initialize all variables and widgets, then pack onto the window
+    :param master: tkinter.Tk object
+    """
     def __init__(self, master):
-        """
-        Initialize all variables and widgets, then pack onto the window
-        :param master: tkinter.Tk object
-        """
         self.window = tk.Canvas(master, width=500, height=300)
         self.reset_button = tk.Button(master, text="Reset", command=self.reset_window)
         self.start_button = tk.Button(master, text="Start", command=self.start_sorting)
@@ -39,8 +39,9 @@ class InsertionSorterGUI():
 
     def start_sorting(self):
         """
-        Start a main loop to iterate through each line, then call the insert()
-        method to move the current line
+        Starts the sorter using basic insertion sort algorithm 
+        The line being compared is highlighted in red, upon completion, all 
+        lines turn green
         """
         self.sorting = True
         for i, line in enumerate(self.sort_list):
@@ -61,9 +62,8 @@ class InsertionSorterGUI():
 
     def insert(self, index, line, lines_skipped=None):
         """
-        Called implicitly from the start_sorting method.
-        Checks if the line is in the correct location, then, highlights
-        skipped lines and continues
+        Called implicitly from the start_sorting method. The skipped lines are 
+        highlighted before returning to the main function
         :param index: int
         :param line: List
         :param lines_skipped: int
@@ -74,20 +74,19 @@ class InsertionSorterGUI():
             pass
         elif line[0] < self.sort_list[index-1][0]:
             lines_skipped += 1
+            self.window.itemconfig(self.sort_list[index-1][1], fill='blue')
+            self.window.update()
+            self.window.itemconfig(self.sort_list[index-1][1], fill='orange')
+            self.window.update()
             self.insert(index-1, line, lines_skipped)
             return
 
         self.sort_list.insert(index, line)
-        self.window.delete(line[1])
-        self.sort_list[index][1] = self.window.create_line(4*index+50, 20, 4*index+50, line[0], fill='red')
+        self.window.coords(line[1], 4*index+50, 20, 4*index+50, line[0])
+        self.window.itemconfig(line[1], fill='black')
         for i in range(index+1, index+lines_skipped+1):
-            self.window.delete(self.sort_list[i][1])
-            self.sort_list[i][1] = self.window.create_line(4*i+50, 20, 4*i+50, self.sort_list[i][0], fill='cyan')
-        self.window.update()
-
-        self.window.itemconfig(self.sort_list[index][1], fill='black')
-        for j in range(index+1, index+lines_skipped+1):
-            self.window.itemconfig(self.sort_list[j][1], fill='black')
+            self.window.coords(self.sort_list[i][1], 4*i+50, 20, 4*i+50, self.sort_list[i][0])
+            self.window.itemconfig(self.sort_list[i][1], fill='black')
         self.window.update()
 
 ##########################################################################
