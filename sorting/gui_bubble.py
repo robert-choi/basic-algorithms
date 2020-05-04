@@ -35,6 +35,8 @@ class BubbleSorterGUI():
             self.sort_list.append([random_height, line_id])
         self.window.update()
 
+    ##########################################################################
+
     def start_sorting(self):
         """
         Starts the sorter using basic bubble sort algorithm
@@ -67,7 +69,9 @@ class BubbleSorterGUI():
                 self.sorting = False
                 for line in self.sort_list:
                     self.window.itemconfig(line[1], fill='green')
-                self.window.update()
+            else:
+                self.window.itemconfig(self.sort_list[i+1][1], fill='blue')
+            self.window.update()
 
 ##########################################################################
 
